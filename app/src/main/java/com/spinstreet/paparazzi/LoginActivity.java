@@ -58,6 +58,10 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
         });
+        s = Helpers.get(this, "password");
+        if (s != null) {
+            mPasswordView.setText(s);
+        }
 
         findViewById(R.id.email_sign_in_button).setOnClickListener(new OnClickListener() {
             @Override
@@ -119,7 +123,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
         final String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        final String password = mPasswordView.getText().toString();
 
         showProgress(true);
 
@@ -143,6 +147,7 @@ public class LoginActivity extends AppCompatActivity {
                             return;
                         }
                         Helpers.set(getApplicationContext(), "email", email);
+                        Helpers.set(getApplicationContext(), "password", password);
                         Session.username = email;
                         Session.jwt = result.getResult().get("token").getAsString();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -157,7 +162,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
         final String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        final String password = mPasswordView.getText().toString();
 
         showProgress(true);
 
@@ -186,6 +191,7 @@ public class LoginActivity extends AppCompatActivity {
                             return;
                         }
                         Helpers.set(getApplicationContext(), "email", email);
+                        Helpers.set(getApplicationContext(), "password", password);
                         Session.username = email;
                         Session.jwt = result.getResult().get("token").getAsString();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
