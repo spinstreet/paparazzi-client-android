@@ -29,7 +29,7 @@
         <activity android:name=".ProfileActivity"></activity>
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.example.android.fileprovider"
+            android:authorities="com.spinstreet.paparazzi.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
