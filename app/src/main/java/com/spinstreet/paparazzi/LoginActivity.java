@@ -132,7 +132,7 @@ public class LoginActivity extends AppCompatActivity {
 //                                return;
 //                            }
                             Session.username = email;
-                            Session.jwt = result.getResult().get("jwt").getAsString();
+//                            Session.jwt = result.getResult().get("jwt").getAsString();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         }
                     });
