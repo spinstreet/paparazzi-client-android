@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.koushikdutta.ion.Response;
 
 /**
  * A login screen that offers login via email/password.
@@ -102,14 +103,16 @@ public class LoginActivity extends AppCompatActivity {
                     .setHeader("Authorization", "JWT " + Session.jwt)
                     .setJsonObjectBody(json)
                     .asJsonObject()
-                    .setCallback(new FutureCallback<JsonObject>() {
+                    .withResponse()
+                    .setCallback(new FutureCallback<Response<JsonObject>>() {
                         @Override
-                        public void onCompleted(Exception e, JsonObject result) {
+                        public void onCompleted(Exception e, Response<JsonObject> result) {
+
                             if (e != null) {
                                 return;
                             }
                             Session.username = email;
-                            Session.jwt = result.get("jwt").getAsString();
+                            Session.jwt = result.getResult().get("jwt").getAsString();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         }
                     });
