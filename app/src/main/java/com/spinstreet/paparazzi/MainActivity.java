@@ -41,7 +41,10 @@ public class MainActivity extends AppCompatActivity {
             "http://i.imgur.com/FSDDkMR.jpg",
             "http://i.imgur.com/qQh26DE.jpg",
             "http://i.imgur.com/MZ3srpv.jpg",
-            "http://i.imgur.com/fRcsH1Z.jpg"
+            "http://i.imgur.com/fRcsH1Z.jpg",
+            "http://i.imgur.com/iaDR8xq.jpg",
+            "http://i.imgur.com/rQizzfi.jpg",
+            "http://i.imgur.com/pfdso0Y.jpg"
         };
         gv.setAdapter(new ImageAdapter(this, images));
     }
