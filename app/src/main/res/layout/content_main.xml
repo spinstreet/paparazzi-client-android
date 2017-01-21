@@ -13,4 +13,15 @@
     tools:context="com.spinstreet.paparazzi.MainActivity"
     tools:showIn="@layout/activity_main">
 
+
+    <GridView
+        android:id="@+id/image_grid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:verticalSpacing="10dp"
+        android:horizontalSpacing="10dp"
+        android:stretchMode="columnWidth"
+        android:gravity="center"
+
+        />
 </RelativeLayout>
