@@ -2,10 +2,8 @@ package com.spinstreet.paparazzi;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -111,26 +109,26 @@ public class LoginActivity extends AppCompatActivity {
                         public void onCompleted(Exception e, Response<JsonObject> result) {
                             if (e != null) {
                                 showProgress(false);
-                                new AlertDialog.Builder(getApplicationContext())
-                                        .setMessage(e.getMessage())
-                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                // User clicked OK button
-                                            }
-                                        })
-                                        .create().show();
+//                                new AlertDialog.Builder(getApplicationContext())
+//                                        .setMessage(e.getMessage())
+//                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                            public void onClick(DialogInterface dialog, int id) {
+//                                                // User clicked OK button
+//                                            }
+//                                        })
+//                                        .create().show();
                                 return;
                             }
                             if (result.getHeaders().code() != 200) {
                                 showProgress(false);
-                                new AlertDialog.Builder(getApplicationContext())
-                                        .setMessage(result.getHeaders().message())
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        // User clicked OK button
-                                    }
-                                })
-                                .create().show();
+//                                new AlertDialog.Builder(getApplicationContext())
+//                                        .setMessage(result.getHeaders().message())
+//                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                            public void onClick(DialogInterface dialog, int id) {
+//                                                // User clicked OK button
+//                                            }
+//                                        })
+//                                        .create().show();
                                 return;
                             }
                             Session.username = email;
