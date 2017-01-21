@@ -1,5 +1,6 @@
 package com.spinstreet.paparazzi;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -10,6 +11,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
+import android.widget.ImageView;
+
+import com.koushikdutta.ion.Ion;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +35,15 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        GridView gv = (GridView) findViewById(R.id.image_grid);
+        String[] images = {
+            "http://i.imgur.com/FSDDkMR.jpg",
+            "http://i.imgur.com/qQh26DE.jpg",
+            "http://i.imgur.com/MZ3srpv.jpg",
+            "http://i.imgur.com/fRcsH1Z.jpg"
+        };
+        gv.setAdapter(new ImageAdapter(this, images));
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

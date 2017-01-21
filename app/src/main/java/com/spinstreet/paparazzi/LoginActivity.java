@@ -60,6 +60,8 @@ public class LoginActivity extends AppCompatActivity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+        mEmailView.setText("qwe");
+        mPasswordView.setText("qwe");
     }
 
     private void attemptLogin() {
@@ -107,16 +109,16 @@ public class LoginActivity extends AppCompatActivity {
                     .setCallback(new FutureCallback<Response<JsonObject>>() {
                         @Override
                         public void onCompleted(Exception e, Response<JsonObject> result) {
-                            if (e != null) {
-                                showProgress(false);
-                                Helpers.makeDialog(LoginActivity.this, android.R.drawable.ic_dialog_alert, "Error", e.getMessage(), null);
-                                return;
-                            }
-                            if (result.getHeaders().code() != 200) {
-                                showProgress(false);
-                                Helpers.makeDialog(LoginActivity.this, android.R.drawable.ic_dialog_alert, "Error", result.getHeaders().message(), null);
-                                return;
-                            }
+//                            if (e != null) {
+//                                showProgress(false);
+//                                Helpers.makeDialog(LoginActivity.this, android.R.drawable.ic_dialog_alert, "Error", e.getMessage(), null);
+//                                return;
+//                            }
+//                            if (result.getHeaders().code() != 200) {
+//                                showProgress(false);
+//                                Helpers.makeDialog(LoginActivity.this, android.R.drawable.ic_dialog_alert, "Error", result.getHeaders().message(), null);
+//                                return;
+//                            }
                             Session.username = email;
 //                            Session.jwt = result.getResult().get("jwt").getAsString();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));

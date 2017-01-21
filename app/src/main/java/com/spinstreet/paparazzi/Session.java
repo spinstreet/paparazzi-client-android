@@ -10,6 +10,6 @@ public class Session {
     public static String jwt = "";
 
     public static String url(String part) {
-        return "http://paparazzi.io/" + part;
+        return "https://spin.wander.host/api/1/" + part;
     }
 }
