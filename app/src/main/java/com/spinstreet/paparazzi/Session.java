@@ -10,6 +10,6 @@ public class Session {
     public static String jwt = "";
 
     public static String url(String part) {
-        return "http://paparazzi.io/" + part;
+        return "http://www.google.com/" + part;
     }
 }

@@ -107,7 +107,7 @@ public class LoginActivity extends AppCompatActivity {
                     .setCallback(new FutureCallback<Response<JsonObject>>() {
                         @Override
                         public void onCompleted(Exception e, Response<JsonObject> result) {
-                            if (e != null) {
+                            /*if (e != null) {
                                 showProgress(false);
                                 Helpers.makeDialog(LoginActivity.this, android.R.drawable.ic_dialog_alert, "Error", e.getMessage(), null);
                                 return;
@@ -116,7 +116,7 @@ public class LoginActivity extends AppCompatActivity {
                                 showProgress(false);
                                 Helpers.makeDialog(LoginActivity.this, android.R.drawable.ic_dialog_alert, "Error", result.getHeaders().message(), null);
                                 return;
-                            }
+                            } */
                             Session.username = email;
 //                            Session.jwt = result.getResult().get("jwt").getAsString();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
