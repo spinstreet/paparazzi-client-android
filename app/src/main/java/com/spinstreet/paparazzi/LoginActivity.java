@@ -107,30 +107,16 @@ public class LoginActivity extends AppCompatActivity {
                     .setCallback(new FutureCallback<Response<JsonObject>>() {
                         @Override
                         public void onCompleted(Exception e, Response<JsonObject> result) {
-//                            if (e != null) {
-//                                showProgress(false);
-////                                new AlertDialog.Builder(getApplicationContext())
-////                                        .setMessage(e.getMessage())
-////                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-////                                            public void onClick(DialogInterface dialog, int id) {
-////                                                // User clicked OK button
-////                                            }
-////                                        })
-////                                        .create().show();
-//                                return;
-//                            }
-//                            if (result.getHeaders().code() != 200) {
-//                                showProgress(false);
-////                                new AlertDialog.Builder(getApplicationContext())
-////                                        .setMessage(result.getHeaders().message())
-////                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-////                                            public void onClick(DialogInterface dialog, int id) {
-////                                                // User clicked OK button
-////                                            }
-////                                        })
-////                                        .create().show();
-//                                return;
-//                            }
+                            if (e != null) {
+                                showProgress(false);
+                                Helpers.makeDialog(LoginActivity.this, android.R.drawable.ic_dialog_alert, "Error", e.getMessage(), null);
+                                return;
+                            }
+                            if (result.getHeaders().code() != 200) {
+                                showProgress(false);
+                                Helpers.makeDialog(LoginActivity.this, android.R.drawable.ic_dialog_alert, "Error", result.getHeaders().message(), null);
+                                return;
+                            }
                             Session.username = email;
 //                            Session.jwt = result.getResult().get("jwt").getAsString();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
@@ -163,5 +149,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }
 
