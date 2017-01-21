@@ -1,9 +1,15 @@
 package com.spinstreet.paparazzi;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -11,7 +17,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -37,6 +42,10 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        String s = Helpers.get(this, "email");
+        if (s != null) {
+            mEmailView.setText(s);
+        }
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -50,26 +59,38 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
+        findViewById(R.id.email_sign_in_button).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
             }
         });
 
+        findViewById(R.id.email_register_button).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                attemptRegister();
+            }
+        });
+
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+
+        if (
+                ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                )
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
     }
 
-    private void attemptLogin() {
-
+    private boolean checkTest() {
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        final String email = mEmailView.getText().toString();
+        String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
@@ -90,39 +111,88 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         if (cancel) focusView.requestFocus();
-        else {
-            showProgress(true);
+        return !cancel;
+    }
 
-            JsonObject json = new JsonObject();
-            json.addProperty("username", email);
-            json.addProperty("email", email);
-            json.addProperty("password", mPasswordView.getText().toString());
-
-            Ion.with(this)
-                    .load(Session.url("login"))
-                    .setHeader("Authorization", "JWT " + Session.jwt)
-                    .setJsonObjectBody(json)
-                    .asJsonObject()
-                    .withResponse()
-                    .setCallback(new FutureCallback<Response<JsonObject>>() {
-                        @Override
-                        public void onCompleted(Exception e, Response<JsonObject> result) {
-                            if (e != null) {
-                                showProgress(false);
-                                Helpers.makeDialog(LoginActivity.this, android.R.drawable.ic_dialog_alert, "Error", e.getMessage(), null);
-                                return;
-                            }
-                            if (result.getHeaders().code() != 200) {
-                                showProgress(false);
-                                Helpers.makeDialog(LoginActivity.this, android.R.drawable.ic_dialog_alert, "Error", result.getHeaders().message(), null);
-                                return;
-                            }
-                            Session.username = email;
-//                            Session.jwt = result.getResult().get("jwt").getAsString();
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        }
-                    });
+    private void attemptLogin() {
+        if (!checkTest()) {
+            return;
         }
+        final String email = mEmailView.getText().toString();
+        String password = mPasswordView.getText().toString();
+
+        showProgress(true);
+
+        Ion.with(this)
+                .load(Session.url("login/"))
+                .setBodyParameter("username", email)
+                .setBodyParameter("email", email)
+                .setBodyParameter("password", password)
+                .asJsonObject()
+                .withResponse()
+                .setCallback(new FutureCallback<Response<JsonObject>>() {
+                    @Override
+                    public void onCompleted(Exception e, Response<JsonObject> result) {
+                        showProgress(false);
+                        if (e != null) {
+                            Helpers.makeDialog(LoginActivity.this, android.R.drawable.ic_dialog_alert, "Error", e.getMessage(), null);
+                            return;
+                        }
+                        if (result.getHeaders().code() != 200) {
+                            Helpers.makeDialog(LoginActivity.this, android.R.drawable.ic_dialog_alert, "Error", result.getHeaders().message(), null);
+                            return;
+                        }
+                        Helpers.set(getApplicationContext(), "email", email);
+                        Session.username = email;
+                        Session.jwt = result.getResult().get("token").getAsString();
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        startActivity(intent);
+                    }
+                });
+    }
+
+    private void attemptRegister() {
+        if (!checkTest()) {
+            return;
+        }
+        final String email = mEmailView.getText().toString();
+        String password = mPasswordView.getText().toString();
+
+        showProgress(true);
+
+        Ion.with(this)
+                .load(Session.url("register/"))
+                .setBodyParameter("username", email)
+                .setBodyParameter("email", email)
+                .setBodyParameter("password1", password)
+                .setBodyParameter("password2", password)
+                .asJsonObject()
+                .withResponse()
+                .setCallback(new FutureCallback<Response<JsonObject>>() {
+                    @Override
+                    public void onCompleted(Exception e, Response<JsonObject> result) {
+                        showProgress(false);
+                        if (e != null) {
+                            Helpers.makeDialog(LoginActivity.this, android.R.drawable.ic_dialog_alert, "Error", e.getMessage(), null);
+                            return;
+                        }
+                        if (result.getHeaders().code() != 201) {
+                            if (result.getResult() != null) {
+                                Helpers.makeDialog(LoginActivity.this, android.R.drawable.ic_dialog_alert, "Error", result.getResult().get("error").getAsString(), null);
+                            } else {
+                                Helpers.makeDialog(LoginActivity.this, android.R.drawable.ic_dialog_alert, "Error", "There was an error retry", null);
+                            }
+                            return;
+                        }
+                        Helpers.set(getApplicationContext(), "email", email);
+                        Session.username = email;
+                        Session.jwt = result.getResult().get("token").getAsString();
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        startActivity(intent);
+                    }
+                });
     }
 
     /**
@@ -148,6 +218,25 @@ public class LoginActivity extends AppCompatActivity {
                 mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 2: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                } else {
+                    Helpers.makeDialog(this, android.R.drawable.ic_dialog_alert, "Error", "We need camera permissions", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            finishAffinity();
+                        }
+                    });
+                }
+                return;
+            }
+        }
     }
 
 
