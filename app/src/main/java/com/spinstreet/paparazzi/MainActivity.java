@@ -1,6 +1,5 @@
 package com.spinstreet.paparazzi;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,7 +8,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,11 +16,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
@@ -54,13 +51,13 @@ public class MainActivity extends AppCompatActivity {
 
         GridView gv = (GridView) findViewById(R.id.image_grid);
         String[] images = {
-            "http://i.imgur.com/FSDDkMR.jpg",
-            "http://i.imgur.com/qQh26DE.jpg",
-            "http://i.imgur.com/MZ3srpv.jpg",
-            "http://i.imgur.com/fRcsH1Z.jpg",
-            "http://i.imgur.com/iaDR8xq.jpg",
-            "http://i.imgur.com/rQizzfi.jpg",
-            "http://i.imgur.com/pfdso0Y.jpg"
+                "http://i.imgur.com/FSDDkMR.jpg",
+                "http://i.imgur.com/qQh26DE.jpg",
+                "http://i.imgur.com/MZ3srpv.jpg",
+                "http://i.imgur.com/fRcsH1Z.jpg",
+                "http://i.imgur.com/iaDR8xq.jpg",
+                "http://i.imgur.com/rQizzfi.jpg",
+                "http://i.imgur.com/pfdso0Y.jpg"
         };
         gv.setAdapter(new ImageAdapter(this, images));
     }
@@ -120,19 +117,25 @@ public class MainActivity extends AppCompatActivity {
         }
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
 
+
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;
             Bitmap a = BitmapFactory.decodeFile(mCurrentPhotoPath, options);
-            Bitmap b = Bitmap.createScaledBitmap(a, a.getWidth()/3, a.getHeight()/3, false);
+            Bitmap b = Bitmap.createScaledBitmap(a, a.getWidth() / 3, a.getHeight() / 3, false);
 
-            FileOutputStream out = null;
+            FileOutputStream out;
             final File resized;
             try {
                 resized = createImagResizedeFile();
                 out = new FileOutputStream(resized);
-                b.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
-                // PNG is a lossless format, the compression factor (100) is ignored
-
+                b.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                try {
+                    if (out != null) {
+                        out.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 Ion.with(this)
                         .load(Session.url("photos/"))
@@ -147,21 +150,31 @@ public class MainActivity extends AppCompatActivity {
                                     e.printStackTrace();
                                     return;
                                 }
-                                if (result != null ){
-                                    Log.e("qwe", result.toString());
+                                if (result != null) {
+                                    Log.e("Blah", result.toString());
+                                    JsonArray json = result.get("data").getAsJsonObject().get("data").getAsJsonArray();
+                                    StringBuilder sb = new StringBuilder();
+                                    try {
+                                        for (int i = 0; i < json.size(); i++) {
+                                            JsonObject obj = json.get(i).getAsJsonObject().get("faceAttributes").getAsJsonObject();
+                                            if (i > 0) sb.append("\n");
+                                            sb.append("Face ").append(i).append(":\n");
+                                            sb.append("Gender :").append(obj.get("gender").getAsString()).append("\n");
+                                            sb.append("Age :").append(obj.get("age").getAsDouble()).append("\n");
+                                            sb.append("Smile :").append(obj.get("Smile").getAsDouble()).append("\n");
+                                            sb.append("Glasses :").append(obj.get("glasses").getAsString()).append("\n");
+                                            sb.append("Gender ").append(obj.get("gender").getAsString()).append("\n");
+                                            sb.append("Moustache ").append(obj.get("facialHair").getAsJsonObject().get("moustache").getAsString()).append("\n");
+                                            sb.append("Beard ").append(obj.get("facialHair").getAsJsonObject().get("beard").getAsString()).append("\n");
+                                            sb.append("Sideburns ").append(obj.get("facialHair").getAsJsonObject().get("sideburns").getAsString()).append("\n");
+                                        }
+                                        Helpers.makeDialog(getApplicationContext(), android.R.drawable.ic_menu_help, "Faces Detected", sb.toString(), null);
+                                    }catch (Exception ignored){}
                                 }
                             }
                         });
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
-                try {
-                    if (out != null) {
-                        out.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
         }
     }
